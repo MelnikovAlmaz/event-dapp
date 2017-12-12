@@ -2,6 +2,9 @@ pragma solidity ^0.4.18;
 import "./Event.sol";
 //["0xca35b7d915458ef540ade6068dfe2f44e8fa733c",  "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c", "0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db"]
 contract CompetitionManagement{
+    // Constants
+    uint NOMINATION_TIME = 1 days;
+
     struct User {
         string name;
         string login;
@@ -9,7 +12,22 @@ contract CompetitionManagement{
         bool isRegistered;
     }
     
-    
+    struct NominationToExpert{
+        uint creation_time;
+        address user;
+        bool isAccepted;
+        bool isDue;
+        uint acceptanceCount;
+    }
+
+    struct NominationToUser{
+        uint creation_time;
+        address user;
+        bool isAccepted;
+        bool isDue;
+        uint acceptanceCount;
+    }
+
     mapping(address => User) _users;
     mapping(address => bool) _experts;
     
@@ -42,8 +60,19 @@ contract CompetitionManagement{
         _events.push(newEvent);
     }
 
-    // Modifiers
-    
+    function changeEvent(address event_address, string name, uint start_date, string competence, address[] expert_list, address[] participant_list) public{
+        Event currentEvent = findEvent(event_address);
+        currentEvent.changeEvent(msg.sender, name, start_date, competence, expert_list, participant_list);
+
+    }
+        // Modifiers
+    function findEvent(address event_address) private returns(Event){
+        for(uint i=0; i<_events.length; i++){
+            if(address(_events[i]) == event_address){
+                return _events[i];
+            }
+        }
+    }
     modifier onlyExpert {
         require(_experts[msg.sender] == true);
         _;
