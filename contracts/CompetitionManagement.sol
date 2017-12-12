@@ -6,34 +6,35 @@ import "./Event.sol";
 contract CompetitionManagement{
     // Constants
     uint NOMINATION_TIME = 1 days;
+    uint NOMINATION_EXPERT_COUNT = 3;
 
     struct User {
-        string name;
-        string login;
-        string password;
-        bool isRegistered;
+    string name;
+    string login;
+    string password;
+    bool isRegistered;
     }
 
     struct NominationToExpert{
-        uint creation_time;
-        address user;
-        bool isAccepted;
-        bool isDue;
-        uint acceptanceCount;
+    uint creation_time;
+    address user;
+    uint acceptanceCount;
+    mapping(address => bool) accepted_experts;
     }
 
     struct NominationToUser{
-        uint creation_time;
-        address user;
-        bool isAccepted;
-        bool isDue;
-        uint acceptanceCount;
+    uint creation_time;
+    address user;
+    uint acceptanceCount;
+    mapping(address => bool) accepted_experts;
     }
 
     mapping(address => User) _users;
     mapping(address => bool) _experts;
 
     address[] public _events;
+    NominationToExpert[] public _nominationToExpert;
+    NominationToUser[] public _nominationToUser;
 
     function CompetitionManagement(address[] creators) public {
         // Number of experts should be greater/equal 3
@@ -42,6 +43,48 @@ contract CompetitionManagement{
         // Add addresses as experts
         for(uint i=0; i<creators.length; i++){
             _experts[creators[i]] = true;
+        }
+    }
+
+    function nominateToExpert() onlyParticipant public {
+        // Create Nomination
+
+        for(uint i=0; i<_nominationToExpert.length; i++){
+            if(_nominationToExpert[i].user == msg.sender){
+                // Check is last nomination was not accepted
+                if(_nominationToExpert[i].acceptanceCount != NOMINATION_EXPERT_COUNT){
+                    // Require last nomination is past
+                    require(_nominationToExpert[i].creation_time + NOMINATION_TIME < now);
+                }
+                // Update nomination
+                _nominationToExpert[i] = NominationToExpert(now, msg.sender, 0);
+                return;
+            }
+        }
+        _nominationToExpert.push(NominationToExpert(now, msg.sender, 0));
+    }
+
+    function submitNominationToExpert(address participant) onlyExpert public {
+        // Check is participant address is not expert
+        require(_experts[participant] == false);
+
+        // Find nomination
+        for(uint i=0; i<_nominationToExpert.length; i++){
+            if(_nominationToExpert[i].user == participant){
+                // Nomination is available by time
+                require(_nominationToExpert[i].creation_time + NOMINATION_TIME > now);
+                // Require expert did not submit
+                require(_nominationToExpert[i].accepted_experts[msg.sender] == false);
+                // Accept submition
+                _nominationToExpert[i].acceptanceCount += 1;
+                _nominationToExpert[i].accepted_experts[msg.sender] = true;
+
+                // Check submittion results
+                if(_nominationToExpert[i].acceptanceCount == NOMINATION_EXPERT_COUNT){
+                    // Make participant an expert
+                    _experts[participant] = true;
+                }
+            }
         }
     }
 
@@ -79,7 +122,6 @@ contract CompetitionManagement{
         return currentEvent.submitAcceptence(msg.sender);
     }
 
-    // Modifiers
     function findEventByAddress(address event_address) private returns(Event){
         bool eventIsFound = false;
         for(uint i=0; i<_events.length; i++){
@@ -90,8 +132,15 @@ contract CompetitionManagement{
         }
         require(eventIsFound);
     }
+
+    // Modifiers
     modifier onlyExpert {
         require(_experts[msg.sender] == true);
+        _;
+    }
+
+    modifier onlyParticipant {
+        require(_experts[msg.sender] == false);
         _;
     }
 }
