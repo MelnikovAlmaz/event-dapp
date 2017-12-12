@@ -13,7 +13,7 @@ contract CompetitionManagement{
         string password;
         bool isRegistered;
     }
-    
+
     struct NominationToExpert{
         uint creation_time;
         address user;
@@ -32,13 +32,13 @@ contract CompetitionManagement{
 
     mapping(address => User) _users;
     mapping(address => bool) _experts;
-    
+
     address[] public _events;
-    
+
     function CompetitionManagement(address[] creators) public {
         // Number of experts should be greater/equal 3
         require(creators.length >= 3);
-        
+
         // Add addresses as experts
         for(uint i=0; i<creators.length; i++){
             _experts[creators[i]] = true;
@@ -69,17 +69,26 @@ contract CompetitionManagement{
     }
 
     function changeEvent(address event_address, string name, uint start_date, string competence, address[] expert_list, address[] participant_list) public{
-        Event currentEvent = Event(findEvent(event_address));
+        Event currentEvent = findEventByAddress(event_address);
         currentEvent.changeEvent(msg.sender, name, start_date, competence, expert_list, participant_list);
 
     }
+
+    function submitEventEddition(address event_address) public returns(bool) {
+        Event currentEvent = findEventByAddress(event_address);
+        return currentEvent.submitAcceptence(msg.sender);
+    }
+
     // Modifiers
-    function findEvent(address event_address) private returns(address){
+    function findEventByAddress(address event_address) private returns(Event){
+        bool eventIsFound = false;
         for(uint i=0; i<_events.length; i++){
             if(_events[i] == event_address){
-                return _events[i];
+                eventIsFound = true;
+                return Event(_events[i]);
             }
         }
+        require(eventIsFound);
     }
     modifier onlyExpert {
         require(_experts[msg.sender] == true);
