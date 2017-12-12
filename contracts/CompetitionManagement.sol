@@ -33,7 +33,7 @@ contract CompetitionManagement{
     mapping(address => User) _users;
     mapping(address => bool) _experts;
     
-    address[] _events;
+    address[] public _events;
     
     function CompetitionManagement(address[] creators) public {
         // Number of experts should be greater/equal 3
