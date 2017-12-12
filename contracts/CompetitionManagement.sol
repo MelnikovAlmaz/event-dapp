@@ -1,8 +1,8 @@
 pragma solidity ^0.4.18;
 import "./Event.sol";
-//["0xca35b7d915458ef540ade6068dfe2f44e8fa733c",  "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c", "0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db"]
-//"A", 124, "B", ["0xca35b7d915458ef540ade6068dfe2f44e8fa733c"], []
-//"0xca35b7d915458ef540ade6068dfe2f44e8fa733c", "A", 124, "B", ["0xca35b7d915458ef540ade6068dfe2f44e8fa733c", "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c"], []
+//Contract creation: ["0xca35b7d915458ef540ade6068dfe2f44e8fa733c",  "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c", "0x4b0897b0513fdc7c541b6d9d7e929c4e5364d2db"]
+//Event creation: "A", 124, "B", ["0xca35b7d915458ef540ade6068dfe2f44e8fa733c"], []
+//Event change: "address_of_event_contract", "Aasdasd", 124, "B", ["0xca35b7d915458ef540ade6068dfe2f44e8fa733c", "0x14723a09acff6d2a60dcdf7aa4aff308fddc160c"], []
 contract CompetitionManagement{
     // Constants
     uint NOMINATION_TIME = 1 days;
@@ -26,6 +26,7 @@ contract CompetitionManagement{
     uint creation_time;
     address user;
     uint acceptanceCount;
+    address initiator;
     mapping(address => bool) accepted_experts;
     }
 
@@ -43,6 +44,51 @@ contract CompetitionManagement{
         // Add addresses as experts
         for(uint i=0; i<creators.length; i++){
             _experts[creators[i]] = true;
+        }
+    }
+
+    function nominateToUser(address expert_address) onlyExpert public {
+        // Check is expert_address is expert
+        require(_experts[expert_address] == true);
+
+        for(uint i=0; i<_nominationToUser.length; i++){
+            if(_nominationToUser[i].user == expert_address){
+                // Check is last nomination was not accepted
+                if(_nominationToUser[i].acceptanceCount != NOMINATION_EXPERT_COUNT){
+                    // Require last nomination is past
+                    require(_nominationToUser[i].creation_time + NOMINATION_TIME < now);
+                }
+                // Update nomination
+                _nominationToUser[i] = NominationToUser(now, expert_address, 0, msg.sender);
+                return;
+            }
+        }
+        _nominationToUser.push(NominationToUser(now, expert_address, 0, msg.sender));
+    }
+
+    function submitNominationToUser(address expert_address) onlyExpert public {
+        // Check is expert_address is expert
+        require(_experts[expert_address] == true);
+
+        // Find nomination
+        for(uint i=0; i<_nominationToUser.length; i++){
+            if(_nominationToUser[i].user == expert_address){
+                // Nomination is available by time
+                require(_nominationToUser[i].creation_time + NOMINATION_TIME > now);
+                // Require sender is not initiator
+                require(_nominationToUser[i].initiator != msg.sender);
+                // Require sender did not submit
+                require(_nominationToUser[i].accepted_experts[msg.sender] == false);
+                // Accept submition
+                _nominationToUser[i].acceptanceCount += 1;
+                _nominationToUser[i].accepted_experts[msg.sender] = true;
+
+                // Check submittion results
+                if(_nominationToUser[i].acceptanceCount == NOMINATION_EXPERT_COUNT){
+                    // Make participant an expert
+                    _experts[expert_address] = false;
+                }
+            }
         }
     }
 
