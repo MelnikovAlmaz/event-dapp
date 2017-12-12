@@ -47,6 +47,14 @@ contract CompetitionManagement{
         }
     }
 
+    function changeMarkOfParticipant(address event_address, address participant, uint mark) onlyExpert public{
+        // Check participant is not expert
+        require(_experts[participant] == false);
+
+        Event currentEvent = findEventByAddress(event_address);
+        currentEvent.changeMarkOfParticipant(msg.sender, participant, mark);
+    }
+
     function nominateToUser(address expert_address) onlyExpert public {
         // Check is expert_address is expert
         require(_experts[expert_address] == true);

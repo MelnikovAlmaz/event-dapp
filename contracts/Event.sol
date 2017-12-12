@@ -48,6 +48,13 @@ contract Event{
         _controller = msg.sender;
     }
 
+    function changeMarkOfParticipant(address sender, address participant, uint mark) onlyController public {
+        require(isExpert(sender) == true);
+        require(isParticipant(participant) == true);
+
+        _marks[participant] = mark;
+    }
+
     function submitAcceptence(address sender) onlyController public returns (bool){
         // Check is editing available
         require(_isEditing);
@@ -122,6 +129,18 @@ contract Event{
         }
         return is_expert;
     }
+
+    function isParticipant(address sender) private returns (bool){
+        bool is_participant = false;
+        for(uint i=0;i<_participants.length;i++){
+            if(_participants[i] == sender){
+                is_participant = true;
+                break;
+            }
+        }
+        return is_participant;
+    }
+
     modifier onlyController {
         require(msg.sender == _controller);
         _;
