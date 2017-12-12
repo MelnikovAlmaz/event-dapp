@@ -151,7 +151,7 @@ contract CompetitionManagement{
             require(_experts[participant_list[i]] == false);
         }
         // Form Event data structure
-        Event newEvent = new Event(name, now, competence_start_date, competence_name, expert_list, participant_list);
+        Event newEvent = new Event(msg.sender, name, now, competence_start_date, competence_name, expert_list, participant_list);
 
         // Add new Event
         _events.push(address(newEvent));

@@ -5,14 +5,15 @@ contract Event{
     // Constant
     uint EVENT_CHANGE_TIME = 3 * 1 days;
 
-    string _name;
-    uint _creation_time;
-    uint _start_date;
-    string _competence;
+    string public _name;
+    uint public _creation_time;
+    uint public _start_date;
+    string public _competence;
+    address public _creator;
 
-    mapping(address => uint) _marks;
-    address[] _participants;
-    address[] _experts;
+    mapping(address => uint) public _marks;
+    address[] public _participants;
+    address[] public _experts;
 
     address _controller;
 
@@ -24,12 +25,12 @@ contract Event{
     address[] _experts;
     }
 
-    bool _isEditing;
+    bool public _isEditing;
     uint _acceptanceCount;
     mapping(address => bool) _isExpertAccepted;
     Edition _edition;
 
-    function Event(string name, uint creation_time, uint start_date, string competence, address[] expert_list, address[] participant_list){
+    function Event(address creator, string name, uint creation_time, uint start_date, string competence, address[] expert_list, address[] participant_list){
         // Init data of Event
         _name = name;
         _creation_time = creation_time;
@@ -37,6 +38,7 @@ contract Event{
         _competence = competence;
         _experts = expert_list;
         _participants = participant_list;
+        _creator = creator;
 
         // Edition data Init
         _isEditing = false;
@@ -48,8 +50,8 @@ contract Event{
 
     function submitAcceptence(address sender) onlyController public returns (bool){
         // Check is editing available
-        require(_isEditing == true);
-        if(_creation_time + EVENT_CHANGE_TIME > now){
+        require(_isEditing);
+        if(_creation_time + EVENT_CHANGE_TIME < now){
             closeEventChange();
             return false;
         }
