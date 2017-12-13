@@ -47,7 +47,7 @@ contract CompetitionManagement{
         }
     }
 
-    function register(string user_name, string user_login, string user_password) isNotRegistered public returns(bool) {
+    function register(string user_name, string user_login, string user_password) notRegistered public returns(bool) {
         // Register
         _users[msg.sender].name = user_name;
         _users[msg.sender].login = user_login;
@@ -56,7 +56,7 @@ contract CompetitionManagement{
         return true;
     }
 
-    function login(string user_login, string user_password) isRegistered public returns (bool) {
+    function login(string user_login, string user_password) registered public returns (bool) {
         require(keccak256(_users[msg.sender].login) == keccak256(user_login));
         require(keccak256(_users[msg.sender].password) == keccak256(user_password));
         return true;
@@ -221,13 +221,13 @@ contract CompetitionManagement{
         _;
     }
 
-    modifier isNotRegistered {
+    modifier notRegistered {
         // Check is user not reqistered
         require(_users[msg.sender].isRegistered == false);
         _;
     }
 
-    modifier isRegistered {
+    modifier registered {
         // Check is user not reqistered
         require(_users[msg.sender].isRegistered == true);
         _;
