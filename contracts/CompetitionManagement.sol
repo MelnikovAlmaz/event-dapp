@@ -187,6 +187,10 @@ contract CompetitionManagement{
         require(eventIsFound);
     }
 
+    function isExpert(address sender) public constant returns(bool){
+        return(_experts[sender]);
+    }
+
     // Modifiers
     modifier onlyExpert {
         require(_experts[msg.sender] == true);
