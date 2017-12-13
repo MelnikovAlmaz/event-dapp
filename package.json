@@ -1,0 +1,30 @@
+{
+  "name": "event-dapp",
+  "version": "1.0.0",
+  "description": "Event Dapp for Digital Skills",
+  "main": "truffle.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node truffle.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MelnikovAlmaz/event-dapp.git"
+  },
+  "keywords": [
+    "event",
+    "dapp"
+  ],
+  "author": "Almaz Melnikov Roman Varnava Anvar Zakirov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MelnikovAlmaz/event-dapp/issues"
+  },
+  "homepage": "https://github.com/MelnikovAlmaz/event-dapp#readme",
+  "dependencies": {
+    "express": "^4.16.2"
+  }
+}
