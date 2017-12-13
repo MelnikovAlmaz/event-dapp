@@ -47,6 +47,21 @@ contract CompetitionManagement{
         }
     }
 
+    function register(string user_name, string user_login, string user_password) isNotRegistered public returns(bool) {
+        // Register
+        _users[msg.sender].name = user_name;
+        _users[msg.sender].login = user_login;
+        _users[msg.sender].password = user_password;
+        _users[msg.sender].isRegistered = true;
+        return true;
+    }
+
+    function login(string user_login, string user_password) isRegistered public returns (bool) {
+        require(keccak256(_users[msg.sender].login) == keccak256(user_login));
+        require(keccak256(_users[msg.sender].password) == keccak256(user_password));
+        return true;
+    }
+
     function changeMarkOfParticipant(address event_address, address participant, uint mark) onlyExpert public{
         // Check participant is not expert
         require(_experts[participant] == false);
@@ -191,6 +206,10 @@ contract CompetitionManagement{
         return(_experts[sender]);
     }
 
+    function isRegistered(address sender) public constant returns(bool){
+        return(_users[sender].isRegistered == true);
+    }
+
     // Modifiers
     modifier onlyExpert {
         require(_experts[msg.sender] == true);
@@ -199,6 +218,18 @@ contract CompetitionManagement{
 
     modifier onlyParticipant {
         require(_experts[msg.sender] == false);
+        _;
+    }
+
+    modifier isNotRegistered {
+        // Check is user not reqistered
+        require(_users[msg.sender].isRegistered == false);
+        _;
+    }
+
+    modifier isRegistered {
+        // Check is user not reqistered
+        require(_users[msg.sender].isRegistered == true);
         _;
     }
 }
