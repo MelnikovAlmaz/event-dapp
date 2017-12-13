@@ -7,8 +7,8 @@
     "test": "test"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node truffle.js"
+    "dev": "lite-server",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
@@ -24,7 +24,7 @@
     "url": "https://github.com/MelnikovAlmaz/event-dapp/issues"
   },
   "homepage": "https://github.com/MelnikovAlmaz/event-dapp#readme",
-  "dependencies": {
-    "express": "^4.16.2"
+  "devDependencies": {
+    "lite-server": "^2.3.0"
   }
 }
