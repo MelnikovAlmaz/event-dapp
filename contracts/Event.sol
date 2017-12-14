@@ -1,6 +1,9 @@
 pragma solidity ^0.4.18;
 
 
+pragma solidity ^0.4.18;
+
+
 contract Event{
     // Constant
     uint EVENT_CHANGE_TIME = 3 * 1 days;
@@ -18,17 +21,17 @@ contract Event{
     address _controller;
 
     struct Edition{
-    string _name;
-    uint _start_date;
-    string _competence;
-    address[] _participants;
-    address[] _experts;
+        string _name;
+        uint _start_date;
+        string _competence;
+        address[] _participants;
+        address[] _experts;
     }
 
     bool public _isEditing;
-    uint _acceptanceCount;
-    mapping(address => bool) _isExpertAccepted;
-    Edition _edition;
+    uint public _acceptanceCount;
+    mapping(address => bool) public _isExpertAccepted;
+    Edition public _edition;
 
     function Event(address creator, string name, uint creation_time, uint start_date, string competence, address[] expert_list, address[] participant_list){
         // Init data of Event
@@ -79,11 +82,11 @@ contract Event{
         require(isExpert(sender));
         // Form Event data structure
         _edition = Edition({
-        _name: name,
-        _start_date: start_date,
-        _competence: competence,
-        _experts: expert_list,
-        _participants: participant_list
+            _name: name,
+            _start_date: start_date,
+            _competence: competence,
+            _experts: expert_list,
+            _participants: participant_list
         });
         _isEditing = true;
         _acceptanceCount = 1;
