@@ -56,10 +56,11 @@ contract CompetitionManagement{
         return true;
     }
 
-    function login(string user_login, string user_password) registered public returns (bool) {
-        require(keccak256(_users[msg.sender].login) == keccak256(user_login));
-        require(keccak256(_users[msg.sender].password) == keccak256(user_password));
-        return true;
+    function login(string user_login, string user_password) registered public constant returns (bool) {
+        bool isCorrect = true;
+        isCorrect = isCorrect && (keccak256(_users[msg.sender].login) == keccak256(user_login));
+        isCorrect = isCorrect && (keccak256(_users[msg.sender].password) == keccak256(user_password));
+        return isCorrect;
     }
 
     function changeMarkOfParticipant(address event_address, address participant, uint mark) onlyExpert public{
